@@ -1,9 +1,11 @@
+part of sockjs_client;
+
 class AjaxBasedTransport extends BufferedSender {
 
   Client ri;
 
   Polling poll = null;
-  
+
   AjaxBasedTransport(Client ri, transUrl, urlSuffix, ReceiverFactory receiverFactory, AjaxObjectFactory xhrFactory) {
     this.ri = ri;
     this.transUrl = transUrl;
@@ -25,9 +27,9 @@ class XhrStreamingTransport extends AjaxBasedTransport {
 
   XhrStreamingTransport(ri, transUrl) :
     super(ri, transUrl, '/xhr_streaming', XhrReceiverFactory, XHRCorsObjectFactory);
-  
+
   static create(ri, transUrl, [baseUrl]) => new XhrStreamingTransport(ri, transUrl);
-  
+
   static bool get enabled {
     return true;
     // Support for CORS Ajax aka Ajax2? Opera 12 claims CORS but

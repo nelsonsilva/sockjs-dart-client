@@ -1,12 +1,14 @@
+part of sockjs_client;
+
 class BufferedSender {
   var sendBuffer;
   var sender;
-  
+
   var sendStop = null;
   var _sendStop;
-  
+
   var transUrl;
-  
+
   sendConstructor(sender) {
     sendBuffer = [];
     this.sender = sender;
@@ -61,16 +63,16 @@ class BufferedSender {
 }
 
 class JsonPGenericSender {
-  
+
   FormElement _sendForm = null;
   TextAreaElement _sendArea = null;
-  
+
   var completed;
-  
+
   JsonPGenericSender(url, payload, callback) {
     FormElement form;
     TextAreaElement area;
- 
+
     if (_sendForm == null) {
       form = _sendForm = new Element.tag('form');
       area = _sendArea = new Element.tag('textarea');
@@ -81,7 +83,7 @@ class JsonPGenericSender {
       form.enctype = 'application/x-www-form-urlencoded';
       form.acceptCharset = "UTF-8";
       form.elements.add(area);
-      document.body.elements.append(form);
+      document.body.elements.add(form);
     }
     form = _sendForm;
     area = _sendArea;
@@ -98,7 +100,7 @@ class JsonPGenericSender {
         iframe.name = id;
     }
     iframe.id = id;
-    form.elements.append(iframe);
+    form.elements.add(iframe);
     iframe.style.display = 'none';
 
     try {
@@ -111,13 +113,13 @@ class JsonPGenericSender {
     var readyStateChangeHandler = (e) {
       if (iframe.readyState == 'complete') completed(null);
     };
-    
+
     completed = (e) {
         if (iframe.on.error.isEmpty) return;
         iframe.on.readyStateChange.remove(readyStateChangeHandler);
         iframe.on.error.remove(completed);
         iframe.on.load.remove(completed);
-        
+
         // Opera mini doesn't like if we GC iframe
         // immediately, thus this timeout.
         utils.delay(() {
@@ -130,7 +132,7 @@ class JsonPGenericSender {
     iframe.on.error.add(completed);
     iframe.on.load.add(completed);
     iframe.on.readyStateChange.add(readyStateChangeHandler);
-    
+
     //return completed;
   }
 }

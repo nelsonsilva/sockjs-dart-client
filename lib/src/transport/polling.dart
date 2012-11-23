@@ -1,13 +1,15 @@
+part of sockjs_client;
+
 class Polling {
-  
+
   Client ri;
   var receiverFactory;
   String recvUrl;
   AjaxObjectFactory xhrFactory;
-  
+
   var poll;
   bool pollIsClosing = false;
-  
+
   Polling(this.ri, this.receiverFactory, this.recvUrl, this.xhrFactory) {
     _scheduleRecv();
   }
@@ -20,7 +22,7 @@ class Polling {
       ri._didMessage(e.data);
     };
     poll.on.message.add(msgHandler);
-    
+
     var closeHandler;
     closeHandler = (e) {
         poll.on.message.remove(msgHandler);

@@ -1,7 +1,9 @@
+part of sockjs_client;
+
  class XhrReceiver extends Receiver {
-   
+
    AbstractXHRObject xo = null;
-  
+
    XhrReceiver(url, AjaxObjectFactory xhrFactory) {
     var buf_pos = 0;
 
@@ -33,5 +35,5 @@
     }
   }
 }
- 
+
 XhrReceiverFactory(String recvUrl, AjaxObjectFactory xhrFactory) => new XhrReceiver(recvUrl, xhrFactory);

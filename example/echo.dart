@@ -1,20 +1,21 @@
-#library("echo");
+library echo;
 
-#import("dart:html");
-#import("dart:json");
-#import("package:sockjs_client/sockjs.dart", prefix:'SockJS');
+import "dart:html";
+import "dart:json";
+import "package:sockjs_client/sockjs.dart" as SockJS;
 
 DivElement div  = query('#first div');
 InputElement inp  = query('#first input');
 FormElement form = query('#first form');
 
 print(m, [p = '']) {
-  if(!p.isEmpty())
+  if(!p.isEmpty) {
     p = JSON.stringify(p);
+  }
   div.elements
     ..add(new Element.html("<code/>")..text=("$m$p"))
     ..add(new Element.html("<br>"));
-  
+
   div.scrollTop += 10000;
 }
 

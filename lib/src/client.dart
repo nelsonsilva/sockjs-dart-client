@@ -1,3 +1,5 @@
+part of sockjs_client;
+
 class CloseEvent {
   int code;
   String reason;
@@ -13,46 +15,46 @@ class MessageEvent {
 }
 
 class SockJSEvents extends event.Events {
-  get open() => this["open"];
-  get message() => this["message"];
-  get close() => this["close"];
-  get heartbeat() => this["heartbeat"];
+  get open => this["open"];
+  get message => this["message"];
+  get close => this["close"];
+  get heartbeat => this["heartbeat"];
 }
-        
+
 class Client implements event.Emitter<SockJSEvents> {
-  
+
   SockJSEvents on = new SockJSEvents();
-  
+
   bool debug;
   bool devel;
-  
+
   String _baseUrl;
   String server = null;
   String protocol = null;
   List _protocols = [];
-  
+
   int readyState = CONNECTING;
-  
+
   Info info;
   num rtt;
   num rto;
   List<String> protocolsWhitelist = [];
-  
+
   var _ir;
-  
+
   var _transport = null;
   Timer _transportTref;
-  
+
   Client(String url, {
     this.devel: false, this.debug: false, this.protocolsWhitelist,
     this.info, this.rtt: 0, this.server}) {
 
     _baseUrl = utils.amendUrl(url);
-    
+
     if (server == null) {
       server = utils.random_number_string(1000);
     }
-    
+
     _ir = new InfoReceiver.forURL(_baseUrl);
     _ir.on.finish.add((InfoReceiverEvent evt) {
         _ir = null;
@@ -64,10 +66,11 @@ class Client implements event.Emitter<SockJSEvents> {
         }
     });
   }
-  
+
   send(data) {
-    if (readyState == CONNECTING)
+    if (readyState == CONNECTING) {
         throw 'INVALID_STATE_ERR';
+    }
     if (readyState == OPEN) {
         _transport.doSend(utils.quote(data));
     }
@@ -124,13 +127,14 @@ class Client implements event.Emitter<SockJSEvents> {
         _didClose(1006, "Server lost session");
     }
   }
-  
+
   _dispatchMessage(data) {
-    if (readyState != OPEN)
+    if (readyState != OPEN) {
             return;
+    }
     on.message.dispatch(new MessageEvent(data));
   }
-  
+
   _dispatchHeartbeat() {
     if (readyState !== OPEN) {
         return;
@@ -169,7 +173,7 @@ class Client implements event.Emitter<SockJSEvents> {
       break;
     }
   }
-  
+
   bool _tryNextProtocol([CloseEvent closeEvent]) {
     if (protocol != null) {
         _debug('Closed transport: $protocol $closeEvent');
@@ -181,11 +185,11 @@ class Client implements event.Emitter<SockJSEvents> {
     }
 
     while(true) {
-      
-      if (_protocols.isEmpty()) {
+
+      if (_protocols.isEmpty) {
         return false;
       }
-      
+
       protocol = _protocols.removeAt(0);
 
       // Some protocols require access to `body`, what if were in
@@ -224,14 +228,14 @@ class Client implements event.Emitter<SockJSEvents> {
       }
     }
   }
-  
+
   _applyInfo(var info) {
     this.info = info;
     this.rto = utils.countRTO(rtt);
     var probed = utils.probeProtocols();
     _protocols = utils.detectProtocols(probed, protocolsWhitelist, info);
   }
-  
+
   _debug(String msg) {
     if (debug) {
        print(msg);

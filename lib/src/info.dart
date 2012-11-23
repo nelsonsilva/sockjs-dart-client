@@ -1,10 +1,12 @@
+part of sockjs_client;
+
 class Info {
-  bool websocket; 
+  bool websocket;
   List<String> origins;
   bool cookieNeeded;
   num entropy;
   bool nullOrigin;
-  
+
   Info.fromJSON(Map json) {
     websocket = json["websocket"];
     origins = json["origins"];
@@ -21,14 +23,14 @@ class InfoReceiverEvent {
 }
 
 class InfoReceiverEvents extends event.Events {
-  get finish() => this["finish"];
+  get finish => this["finish"];
 }
-        
+
 abstract class InfoReceiver implements event.Emitter<InfoReceiverEvents> {
   InfoReceiverEvents on;
-  
+
   InfoReceiver() : on = new InfoReceiverEvents();
-  
+
   factory InfoReceiver.forURL(String baseUrl) {
     if (utils.isSameOriginUrl(baseUrl)) {
         // If, for some reason, we have SockJS locally - there's no
@@ -52,7 +54,7 @@ abstract class InfoReceiver implements event.Emitter<InfoReceiverEvents> {
 }
 
 class AjaxInfoReceiver extends InfoReceiver {
-  
+
   AjaxInfoReceiver(String baseUrl, AjaxObjectFactory xhrFactory) {
     utils.delay(() => doXhr(baseUrl, xhrFactory));
   }
@@ -91,7 +93,7 @@ class InfoReceiverIframe extends InfoReceiver {
         go();
     }
   }
-    
+
     go() {
       // TODO(nelsonsilva)
       /*
@@ -120,7 +122,7 @@ class InfoReceiverIframe extends InfoReceiver {
 
 
 class InfoReceiverFake extends InfoReceiver {
-  
+
   InfoReceiverFake() {
     // It may not be possible to do cross domain AJAX to get the info
     // data, for example for IE7. But we want to run JSONP, so let's
@@ -130,7 +132,7 @@ class InfoReceiverFake extends InfoReceiver {
 }
 
 
-// FacadeJS['w-iframe-info-receiver'] 
+// FacadeJS['w-iframe-info-receiver']
 class WInfoReceiverIframe {
   WInfoReceiverIframe(ri, _trans_url, baseUrl) {
     var ir = new AjaxInfoReceiver(baseUrl, XHRLocalObjectFactory);

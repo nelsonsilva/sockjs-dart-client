@@ -1,11 +1,13 @@
+part of sockjs_client;
+
 class WebSocketTransport {
   Client ri;
   var url;
-  
+
   WebSocket ws;
-  
+
   static create(ri, transUrl, [baseUrl]) => new WebSocketTransport(ri, transUrl);
-  
+
   WebSocketTransport(this.ri, transUrl) {
     var url = '$transUrl/websocket';
     if (url.startsWith('https')) {
@@ -13,14 +15,14 @@ class WebSocketTransport {
     } else {
         url = 'ws${url.substring(4)}';
     }
-    
+
     this.url = url;
-    
+
     ws = new WebSocket(url);
-    
-    
-    ws.on.message.add(_msgHandler); 
-    
+
+
+    ws.on.message.add(_msgHandler);
+
     // Firefox has an interesting bug. If a websocket connection is
     // created after onbeforeunload, it stays alive even when user
     // navigates away from the page. In such situation let's lie -
@@ -32,7 +34,7 @@ class WebSocketTransport {
   }
 
   _msgHandler(m) => ri._didMessage(m.data);
-  
+
   _closeHandler(m) => ri._didMessage(utils.closeFrame(1006, "WebSocket connection broken"));
 
   doSend(data) => ws.send('[$data]');
@@ -43,7 +45,7 @@ class WebSocketTransport {
         ws.on.close.remove(_closeHandler);
         ws.close();
         //utils.unload_del(that.unload_ref);
-        //that.unload_ref = null; 
+        //that.unload_ref = null;
         ri = ws = null;
     }
   }
@@ -51,18 +53,18 @@ class WebSocketTransport {
   static bool get enabled {
     var res = true;
     var ws;
-    
+
     // Ugly detection stuff - must be online
     try {
       ws = new WebSocket('ws://echo.websocket.org');
-    } on Dynamic catch(e) {
+    } on dynamic catch(e) {
       res = false;
     } finally {
       try {
         ws.on.open.add((e) => ws.close());
       } catch (_){}
     }
-    
+
     return res;
   }
 

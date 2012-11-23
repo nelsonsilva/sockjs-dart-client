@@ -1,9 +1,11 @@
+part of sockjs_client;
+
 class XHREvents extends event.Events {
-  get chunk() => this["chunk"];
-  get finish() => this["finish"];
-  get timeout() => this["timeout"];
+  get chunk => this["chunk"];
+  get finish => this["finish"];
+  get timeout => this["timeout"];
 }
-        
+
 class StatusEvent {
   int status;
   String text;
@@ -16,9 +18,9 @@ class AbstractXHRObject implements event.Emitter<XHREvents> {
   XHREvents on = new XHREvents();
 
   HttpRequest xhr;
-  
+
   _start(method, url, payload, {noCredentials: false, headers}) {
-    
+
     try {
         xhr = new HttpRequest();
     } catch(x) {};
@@ -37,7 +39,7 @@ class AbstractXHRObject implements event.Emitter<XHREvents> {
     // Explorer tends to keep connection open, even after the
     // tab gets closed: http://bugs.jquery.com/ticket/5280
     //that.unload_ref = utils.unload_add(function(){that._cleanup(true);});
-    
+
     try {
         xhr.open(method, url, true);
     } catch(e) {
@@ -57,7 +59,7 @@ class AbstractXHRObject implements event.Emitter<XHREvents> {
     }
 
     xhr.on.readyStateChange.add(_readyStateHandler);
-    
+
     xhr.send(payload);
   }
 
@@ -72,7 +74,7 @@ class AbstractXHRObject implements event.Emitter<XHREvents> {
           text = xhr.responseText;
         } catch (x) {};
         // IE does return readystate == 3 for 404 answers.
-        if (text != null && !text.isEmpty()) {
+        if (text != null && !text.isEmpty) {
           on.chunk.dispatch(new StatusEvent(status, text));
         }
         break;
@@ -82,9 +84,9 @@ class AbstractXHRObject implements event.Emitter<XHREvents> {
         break;
     }
   }
-  
+
   _cleanup([abort = false]) {
-    
+
     if (xhr == null) return;
     // utils.unload_del(that.unload_ref);
 
@@ -114,7 +116,7 @@ class XHRCorsObject extends AbstractXHRObject {
 
 
 class XHRLocalObject extends AbstractXHRObject {
-  XHRLocalObject (method, url, payload, {noCredentials, headers}) {    
+  XHRLocalObject (method, url, payload, {noCredentials, headers}) {
     utils.delay(() => _start(method, url, payload, noCredentials: true));
     }
 }
@@ -129,7 +131,7 @@ XHRCorsObjectFactory(method, baseUrl, [payload]) => new XHRCorsObject(method, ba
 // 4. Nope, sorry.
 isXHRCorsCapable() {
     return 1;
-    
+
     /*
     if (window["XMLHttpRequest"] != null && window["'withCredentials' in new XMLHttpRequest()) {
         return 1;

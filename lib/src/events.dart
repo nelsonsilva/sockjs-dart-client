@@ -1,4 +1,4 @@
-#library('events');
+library events;
 
 typedef void Listener(event);
 
@@ -8,28 +8,28 @@ class Event {
 }
 
 class Events {
-  
+
   Map<String, ListenerList> _listeners;
-  
+
   Events() : _listeners = <ListenerList>{};
-  
+
   ListenerList operator [](String type) => _listeners.putIfAbsent(type, () => new ListenerList(type));
-  
+
   removeAllListeners() => _listeners = {};
 }
 
-interface Emitter<E extends Events>{
-  
-  final E on;
-  
+abstract class Emitter<E extends Events>{
+
+  E on;
+
 }
 
 class ListenerList {
-  
+
   final String _type;
 
   final List<Listener> _listeners;
-  
+
   ListenerList(this._type) : _listeners = <Listener>[];
 
   ListenerList add(Listener listener) {
@@ -54,9 +54,9 @@ class ListenerList {
   void _remove(Listener listener) {
     _listeners.removeRange(_listeners.indexOf(listener), 1);
   }
-  
-  int get length() => _listeners.length;
-  
-  bool isEmpty() => _listeners.isEmpty();
+
+  int get length => _listeners.length;
+
+  bool isEmpty() => _listeners.isEmpty;
 }
 

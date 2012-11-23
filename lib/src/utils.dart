@@ -1,11 +1,11 @@
-#library("utils");
+library utils;
 
-#import('dart:math', prefix:'Math');
-#import('dart:html');
-#import('dart:json');
-#import('dart:isolate');
+import 'dart:math' as Math;
+import 'dart:html';
+import 'dart:json';
+import 'dart:isolate';
 
-#import("package:sockjs_client/sockjs.dart", prefix:'SockJS');
+import "package:sockjs_client/sockjs.dart" as SockJS;
 
 const random_string_chars = 'abcdefghijklmnopqrstuvwxyz0123456789_';
 String random_string(length, [max]) {
@@ -32,10 +32,10 @@ String random_number_string(max) {
 }
 
 bool flatUrl(url) => url.indexOf('?') == -1 && url.indexOf('#') == -1;
-  
+
 amendUrl(String url) {
     var dl = window.location;
-    
+
     if (url == null) {
         throw 'Wrong url for SockJS';
     }
@@ -59,7 +59,7 @@ amendUrl(String url) {
 Timer delay(fn, [int time = 0]) => new Timer(time, (_) => fn() );
 
 closeFrame(code, reason) => 'c${JSON.stringify([code, reason])}';
-  
+
 bool userSetCode(int code) => code == 1000 || (code >= 3000 && code <= 4999);
 
 // See: http://www.erg.abdn.ac.uk/~gerrit/dccp/notes/ccid2/rto_estimator/
@@ -119,7 +119,7 @@ List detectProtocols(Map probed, [List protocols_whitelist, SockJS.Info info] ) 
         if (pe[proto] != null) {
             protocols.add(proto);
         } else {
-            if (!protos.isEmpty()) {
+            if (!protos.isEmpty) {
                 maybe_push(protos);
             }
         }

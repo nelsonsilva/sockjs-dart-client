@@ -1,21 +1,21 @@
-#library("sockjs-client");
+library sockjs_client;
 
-#import("dart:html");
-#import("dart:json");
-#import("dart:isolate");
+import "dart:html";
+import "dart:json";
+import "dart:isolate";
 
-#import("src/events.dart", prefix:'event');
-#import("src/utils.dart", prefix:'utils');
+import "src/events.dart" as event;
+import "src/utils.dart" as utils;
 
-#source("src/ajax.dart");
-#source("src/client.dart");
-#source("src/info.dart");
-#source("src/transport/polling.dart");
-#source("src/transport/sender.dart");
-#source("src/transport/receiver.dart");
-#source("src/transport/receiver-xhr.dart");
-#source("src/transport/websocket.dart");
-#source("src/transport/xhr.dart");
+part "src/ajax.dart";
+part "src/client.dart";
+part "src/info.dart";
+part "src/transport/polling.dart";
+part "src/transport/sender.dart";
+part "src/transport/receiver.dart";
+part "src/transport/receiver-xhr.dart";
+part "src/transport/websocket.dart";
+part "src/transport/xhr.dart";
 
 const version  = "<!-- version -->";
 
@@ -35,7 +35,7 @@ class Protocol {
 }
 
 // Keep dart2js happy ... no lazy initialization.
-Map<String, Protocol> _protocols; 
+Map<String, Protocol> _protocols;
 
 get PROTOCOLS {
   if(_protocols == null) {
