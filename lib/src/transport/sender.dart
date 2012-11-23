@@ -42,7 +42,7 @@ class BufferedSender {
     }
 
   sendSchedule() {
-    if (!sendBuffer.isEmpty()) {
+    if (!sendBuffer.isEmpty) {
         var payload = '[${Strings.join(sendBuffer, ',')}]';
         sendStop = sender(transUrl,
                            payload,

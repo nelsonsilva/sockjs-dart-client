@@ -57,6 +57,6 @@ class ListenerList {
 
   int get length => _listeners.length;
 
-  bool isEmpty() => _listeners.isEmpty;
+  bool get isEmpty => _listeners.isEmpty;
 }
 
