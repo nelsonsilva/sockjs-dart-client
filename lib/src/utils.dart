@@ -2,20 +2,19 @@ library utils;
 
 import 'dart:math' as Math;
 import 'dart:html';
-import 'dart:json';
-import 'dart:isolate';
+import 'dart:convert';
 
 import "package:sockjs_client/sockjs.dart" as SockJS;
 
 const random_string_chars = 'abcdefghijklmnopqrstuvwxyz0123456789_';
 String random_string(length, [max]) {
-    if (!?max) max = random_string_chars.length;
+    if (max == null) max = random_string_chars.length;
     var i, ret = [], rnd = new Math.Random(), r;
     for(i=0; i < length; i++) {
         r = rnd.nextInt(max);
         ret.add( random_string_chars.substring(r, r+1) );
     }
-    return Strings.join(ret, '');
+    return ret.join('');
 }
 
 int random_number(max) => new Math.Random().nextInt(max);
@@ -26,7 +25,7 @@ String random_number_string(max) {
     for (int i = 0; i < t+1; i++) {
       l.add('0');
     }
-    var p = Strings.join(l,'');
+    var p = l.join('');
     var s = "$p${random_number(max)}";
     return s.substring(s.length - t);
 }
@@ -44,11 +43,11 @@ amendUrl(String url) {
     }
 
     //  '//abc' --> 'http://abc'
-    if (url.indexOf('//') === 0) {
+    if (identical(url.indexOf('//'), 0)) {
         url = "${dl.protocol}$url";
     }
     // '/abc' --> 'http://localhost:80/abc'
-    if (url.indexOf('/') === 0) {
+    if (identical(url.indexOf('/'), 0)) {
         url = "${dl.protocol}//${dl.host}$url";
     }
     // strip trailing slashes
@@ -76,14 +75,13 @@ num countRTO(num rtt) {
 
 bool isSameOriginUrl(String url_a, [String url_b]) {
     // location.origin would do, but it's not always available.
-    if (!?url_b) url_b = window.location.toString();
+    if (url_b == null) url_b = window.location.toString();
 
-    return ( Strings.join( url_a.split('/').getRange(0,3), '/')
-                ==
-              Strings.join(url_b.split('/').getRange(0,3),'/'));
+    return ( url_a.split('/').getRange(0,3).join('/')
+              == url_b.split('/').getRange(0,3).join('/'));
 }
 
-String quote(String string) => JSON.stringify(string);
+String quote(String string) => JSON.encode(string);
 
 const _all_protocols = const [
                        'websocket',

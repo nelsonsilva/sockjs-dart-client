@@ -1,18 +1,18 @@
 library echo;
 
 import "dart:html";
-import "dart:json";
+import "dart:convert";
 import "package:sockjs_client/sockjs.dart" as SockJS;
 
-DivElement div  = query('#first div');
-InputElement inp  = query('#first input');
-FormElement form = query('#first form');
+DivElement div  = querySelector('#first div');
+InputElement inp  = querySelector('#first input');
+FormElement form = querySelector('#first form');
 
 print(m, [p = '']) {
   if(!p.isEmpty) {
-    p = JSON.stringify(p);
+    p = JSON.encode(p);
   }
-  div.elements
+  div.children
     ..add(new Element.html("<code/>")..text=("$m$p"))
     ..add(new Element.html("<br>"));
 
@@ -23,13 +23,13 @@ main() {
   print("Starting");
   var sockjs_url = 'http://127.0.0.1:8081/echo';
   var sockjs = new SockJS.Client(sockjs_url, protocolsWhitelist:['websocket', 'xhr-streaming'], debug: true);
-  query('#first input').focus();
+  querySelector('#first input').focus();
 
   sockjs.on.open.add( (_) => print('[*] open ${sockjs.protocol}') );
   sockjs.on.message.add( (e) => print('[.] message ${e.data}') );
   sockjs.on.close.add( (_) => print('[*] close') );
 
-  inp.on.keyUp.add( (KeyboardEvent e) {
+  inp.onKeyUp.listen( (KeyboardEvent e) {
     if (e.keyCode == 13) {
       print('[ ] sending ${inp.value}');
       sockjs.send(inp.value);

@@ -54,7 +54,7 @@ class AbstractXHRObject implements event.Emitter<XHREvents> {
         // "This never affects same-site requests."
         xhr.withCredentials = true;
     }
-    if (?headers) {
+    if (headers != null) {
         headers.forEach((k, v) => xhr.setRequestHeader(k, v));
     }
 

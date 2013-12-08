@@ -43,7 +43,7 @@ class BufferedSender {
 
   sendSchedule() {
     if (!sendBuffer.isEmpty) {
-        var payload = '[${Strings.join(sendBuffer, ',')}]';
+        var payload = '[${sendBuffer.join(',')}]';
         sendStop = sender(transUrl,
                            payload,
                            ([status, reason]) {
@@ -82,8 +82,8 @@ class JsonPGenericSender {
       form.method = 'POST';
       form.enctype = 'application/x-www-form-urlencoded';
       form.acceptCharset = "UTF-8";
-      form.elements.add(area);
-      document.body.elements.add(form);
+      form.children.add(area);
+      document.body.children.add(form);
     }
     form = _sendForm;
     area = _sendArea;
@@ -100,7 +100,7 @@ class JsonPGenericSender {
         iframe.name = id;
     }
     iframe.id = id;
-    form.elements.add(iframe);
+    form.children.add(iframe);
     iframe.style.display = 'none';
 
     try {

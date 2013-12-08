@@ -1,8 +1,7 @@
 library sockjs_client;
 
 import "dart:html";
-import "dart:json";
-import "dart:isolate";
+import "dart:convert";
 
 import "src/events.dart" as event;
 import "src/utils.dart" as utils;
