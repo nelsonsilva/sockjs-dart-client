@@ -3,7 +3,6 @@ library utils;
 import 'dart:math' as Math;
 import 'dart:html';
 import 'dart:convert';
-import 'dart:async';
 
 import "package:sockjs_client/sockjs.dart" as SockJS;
 
