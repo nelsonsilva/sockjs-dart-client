@@ -3,6 +3,7 @@ library utils;
 import 'dart:math' as Math;
 import 'dart:html';
 import 'dart:convert';
+import 'dart:async';
 
 import "package:sockjs_client/sockjs.dart" as SockJS;
 
@@ -55,9 +56,7 @@ amendUrl(String url) {
     return url;
 }
 
-Timer delay(fn, [int time = 0]) => new Timer(time, (_) => fn() );
-
-closeFrame(code, reason) => 'c${JSON.stringify([code, reason])}';
+closeFrame(code, reason) => 'c${JSON.encode([code, reason])}';
 
 bool userSetCode(int code) => code == 1000 || (code >= 3000 && code <= 4999);
 

@@ -11,7 +11,7 @@ class Events {
 
   Map<String, ListenerList> _listeners;
 
-  Events() : _listeners = <ListenerList>{};
+  Events() : _listeners = <String, ListenerList>{};
 
   ListenerList operator [](String type) => _listeners.putIfAbsent(type, () => new ListenerList(type));
 

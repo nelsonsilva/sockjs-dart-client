@@ -110,7 +110,7 @@ class Client implements event.Emitter<SockJSEvents> {
     }
     readyState = CLOSED;
 
-    utils.delay(() => on.close.dispatch(close_event));
+    Timer.run(on.close.dispatch(close_event));
   }
 
   _dispatchOpen() {
@@ -136,7 +136,7 @@ class Client implements event.Emitter<SockJSEvents> {
   }
 
   _dispatchHeartbeat() {
-    if (readyState !== OPEN) {
+    if (!identical(readyState, OPEN)) {
         return;
     }
     on.heartbeat.dispatch();
@@ -151,7 +151,7 @@ class Client implements event.Emitter<SockJSEvents> {
     case 'a':
       var s = data.substring(1);
       if (s == null) s = '[]';
-      var payload = JSON.parse(s);
+      var payload = JSON.decode(s);
       for(var i=0; i < payload.length; i++){
           _dispatchMessage(payload[i]);
       }
@@ -159,13 +159,13 @@ class Client implements event.Emitter<SockJSEvents> {
     case 'm':
       var s = data.substring(1);
       if (s == null) s = 'null';
-      var payload = JSON.parse(s);
+      var payload = JSON.decode(s);
       _dispatchMessage(payload);
       break;
     case 'c':
       var s = data.substring(1);
       if (s == null) s = '[]';
-      var payload = JSON.parse(s);
+      var payload = JSON.decode(s);
       _didClose(payload[0], payload[1]);
       break;
     case 'h':
@@ -198,9 +198,9 @@ class Client implements event.Emitter<SockJSEvents> {
           PROTOCOLS[protocol].needBody &&
           ( (document.body == null) || (document.readyState != null && document.readyState != 'complete'))
           ) {
-          _protocols.insertRange(0, 1, protocol);
+          _protocols.insert(0, protocol);
           this.protocol = 'waiting-for-load';
-          document.on.load.add( (_) => _tryNextProtocol());
+          document.onLoad.listen( (_) => _tryNextProtocol());
           return true;
       }
 
@@ -211,14 +211,14 @@ class Client implements event.Emitter<SockJSEvents> {
           var roundTrips = PROTOCOLS[protocol].roundTrips;
           var to = rto * roundTrips;
           if (to == 0) to = 5000;
-          _transportTref = utils.delay(() {
+          _transportTref = new Timer(new Duration(milliseconds:to), () {
               if (readyState == CONNECTING) {
                   // I can't understand how it is possible to run
                   // this timer, when the state is CLOSED, but
                   // apparently in IE everythin is possible.
                   _didClose(2007, "Transport timeouted");
               }
-          }, to);
+          });
 
           var connid = utils.random_string(8);
           var trans_url = "$_baseUrl/$server/$connid";
