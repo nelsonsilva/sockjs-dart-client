@@ -1,9 +1,9 @@
 part of sockjs_client;
 
 class XHREvents extends event.Events {
-  get chunk => this["chunk"];
-  get finish => this["finish"];
-  get timeout => this["timeout"];
+  event.ListenerList get chunk => this["chunk"];
+  event.ListenerList get finish => this["finish"];
+  event.ListenerList get timeout => this["timeout"];
 }
 
 class StatusEvent {
@@ -110,7 +110,7 @@ class AbstractXHRObject implements event.Emitter<XHREvents> {
 
 class XHRCorsObject extends AbstractXHRObject {
    XHRCorsObject(method, url, payload, {noCredentials, headers} )  {
-    Timer.run(_start(method, url, payload, noCredentials: false));
+    Timer.run(() =>_start(method, url, payload, noCredentials: false));
    }
 }
 
@@ -118,7 +118,7 @@ class XHRCorsObject extends AbstractXHRObject {
 
 class XHRLocalObject extends AbstractXHRObject {
   XHRLocalObject (method, url, payload, {noCredentials, headers}) {
-    Timer.run(_start(method, url, payload, noCredentials: true));
+    Timer.run(() =>_start(method, url, payload, noCredentials: true));
     }
 }
 

@@ -2,7 +2,7 @@ part of sockjs_client;
 
 class WebSocketTransport {
   Client ri;
-  var url;
+  String url;
 
   WebSocket ws;
   StreamSubscription omhss;

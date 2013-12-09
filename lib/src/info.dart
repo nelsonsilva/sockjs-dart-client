@@ -56,14 +56,14 @@ abstract class InfoReceiver implements event.Emitter<InfoReceiverEvents> {
 class AjaxInfoReceiver extends InfoReceiver {
 
   AjaxInfoReceiver(String baseUrl, AjaxObjectFactory xhrFactory) {
-    Timer.run(doXhr(baseUrl, xhrFactory));
+    Timer.run(() => doXhr(baseUrl, xhrFactory));
   }
 
   doXhr(String baseUrl, AjaxObjectFactory xhrFactory) {
     var t0 = new DateTime.now().millisecondsSinceEpoch;
     var xo = xhrFactory('GET', "$baseUrl/info");
 
-    var tref = new Timer(new Duration(milliseconds:8000), xo.on.timeout.dispatch());
+    var tref = new Timer(new Duration(milliseconds:8000), xo.on.timeout.dispatch);
 
     xo.on.finish.add( (StatusEvent evt) {
         tref.cancel();
@@ -127,7 +127,7 @@ class InfoReceiverFake extends InfoReceiver {
     // It may not be possible to do cross domain AJAX to get the info
     // data, for example for IE7. But we want to run JSONP, so let's
     // fake the response, with rtt=2s (rto=6s).
-    new Timer(new Duration(milliseconds:2000), on.finish.dispatch());
+    new Timer(new Duration(milliseconds:2000), on.finish.dispatch);
   }
 }
 

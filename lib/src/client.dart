@@ -110,7 +110,7 @@ class Client implements event.Emitter<SockJSEvents> {
     }
     readyState = CLOSED;
 
-    Timer.run(on.close.dispatch(close_event));
+    Timer.run(() => on.close.dispatch(close_event));
   }
 
   _dispatchOpen() {

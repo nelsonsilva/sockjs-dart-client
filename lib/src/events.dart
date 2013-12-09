@@ -13,7 +13,9 @@ class Events {
 
   Events() : _listeners = <String, ListenerList>{};
 
-  ListenerList operator [](String type) => _listeners.putIfAbsent(type, () => new ListenerList(type));
+  ListenerList operator [](String type) => _listeners.putIfAbsent(type, () {
+    return new ListenerList(type); 
+  });
 
   removeAllListeners() => _listeners = {};
 }

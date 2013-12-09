@@ -1,8 +1,8 @@
 part of sockjs_client;
 
 class ReceiverEvents extends event.Events {
-  get message => this["message"];
-  get close => this["close"];
+  event.ListenerList get message => this["message"];
+  event.ListenerList get close => this["close"];
 }
 
 class Receiver implements event.Emitter<ReceiverEvents> {
