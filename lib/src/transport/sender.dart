@@ -113,14 +113,14 @@ class JsonPGenericSender {
     form.submit();
 
     var readyStateChangeHandler = (e) {
-      if (iframe.readyState == 'complete') completed(null);
+      if (new JsObject.fromBrowserObject(iframe)["readyState"] == 'complete') completed(null);
     };
 
+    var subscriptions;
+
     completed = (e) {
-        if (iframe.on.error.isEmpty) return;
-        iframe.on.readyStateChange.remove(readyStateChangeHandler);
-        iframe.on.error.remove(completed);
-        iframe.on.load.remove(completed);
+        if (subscriptions == null) return;
+        subscriptions.forEach((s) => s.cancel());
 
         // Opera mini doesn't like if we GC iframe
         // immediately, thus this timeout.
@@ -131,9 +131,12 @@ class JsonPGenericSender {
         area.value = '';
         callback();
     };
-    iframe.on.error.add(completed);
-    iframe.on.load.add(completed);
-    iframe.on.readyStateChange.add(readyStateChangeHandler);
+
+    subscriptions = [
+      iframe.onError.listen(completed),
+      iframe.onLoad.listen(completed),
+      iframe.on["readyStateChange"].listen(readyStateChangeHandler)
+    ];
 
     //return completed;
   }
@@ -142,7 +145,7 @@ class JsonPGenericSender {
 createAjaxSender(AjaxObjectFactory xhrFactory)
     => (url, payload, callback([status, reason])) {
         AbstractXHRObject xo = xhrFactory('POST', '$url/xhr_send', payload);
-        xo.on.finish.add((e) {
+        xo.onFinish.listen((e) {
             callback(e.status);
         });
         return (abort_reason) {
