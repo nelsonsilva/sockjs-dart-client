@@ -8,7 +8,7 @@ part of sockjs_client;
     var buf_pos = 0;
 
     xo = xhrFactory('POST', url);
-    xo.on.chunk.add((e){
+    xo.onChunk.listen((e){
         if (e.status != 200) return;
         while (true) {
             var buf = e.text.substring(buf_pos);
@@ -16,21 +16,21 @@ part of sockjs_client;
             if (p == -1) break;
             buf_pos += p+1;
             var msg = buf.substring(0, p);
-            on.message.dispatch(new MessageEvent(msg));
+            dispatch(new MessageEvent(msg));
         }
     });
-    xo.on.finish.add((e) {
-        xo.on.chunk.dispatch(new StatusEvent(e.status, e.text));
+    xo.onFinish.listen((e) {
+        dispatch(new StatusEvent("chunk", e.status, e.text));
         xo = null;
         var reason = (e.status == 200) ? 'network' : 'permanent';
-        on.close.dispatch(new CloseEvent(reason: reason));
+        dispatch(new CloseEvent(reason: reason));
     });
   }
 
   abort() {
     if (xo != null) {
         xo.close();
-        on.close.dispatch(new CloseEvent(reason: 'user'));
+        dispatch(new CloseEvent(reason: 'user'));
         xo = null;
     }
   }

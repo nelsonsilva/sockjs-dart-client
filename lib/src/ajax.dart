@@ -1,24 +1,21 @@
 part of sockjs_client;
 
-class XHREvents extends event.Events {
-  event.ListenerList get chunk => this["chunk"];
-  event.ListenerList get finish => this["finish"];
-  event.ListenerList get timeout => this["timeout"];
-}
-
-class StatusEvent {
+class StatusEvent extends event.Event {
   int status;
   String text;
-  StatusEvent([this.status = 0, this.text = ""]);
+  StatusEvent(String type, [this.status = 0, this.text = ""]) : super(type);
 }
 
 typedef AbstractXHRObject AjaxObjectFactory(String method, String baseUrl, [payload]);
 
-class AbstractXHRObject implements event.Emitter<XHREvents> {
-  XHREvents on = new XHREvents();
+class AbstractXHRObject extends Object with event.Emitter {
 
   HttpRequest xhr;
   StreamSubscription changeSubscription;
+
+  Stream get onChunk => this["chunk"];
+  Stream get onFinish => this["finish"];
+  Stream get onTimeout => this["timeout"];
 
   _start(method, url, payload, {noCredentials: false, headers}) {
 
@@ -45,7 +42,7 @@ class AbstractXHRObject implements event.Emitter<XHREvents> {
         xhr.open(method, url);
     } catch(e) {
         // IE raises an exception on wrong port.
-        on.finish.dispatch(new StatusEvent());
+        dispatch(new StatusEvent("finish"));
         _cleanup();
         return;
     };
@@ -76,11 +73,11 @@ class AbstractXHRObject implements event.Emitter<XHREvents> {
         } catch (x) {};
         // IE does return readystate == 3 for 404 answers.
         if (text != null && !text.isEmpty) {
-          on.chunk.dispatch(new StatusEvent(status, text));
+          dispatch(new StatusEvent("chunk", status, text));
         }
         break;
       case 4:
-        on.finish.dispatch(new StatusEvent( xhr.status, xhr.responseText));
+        dispatch(new StatusEvent("finish", xhr.status, xhr.responseText));
         _cleanup(false);
         break;
     }

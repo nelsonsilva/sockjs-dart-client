@@ -1,29 +1,20 @@
 part of sockjs_client;
 
-class CloseEvent {
+class CloseEvent extends event.Event {
   int code;
   String reason;
   bool wasClean;
   var lastEvent;
 
-  CloseEvent({this.code, this.reason, this.wasClean, this.lastEvent});
+  CloseEvent({this.code, this.reason, this.wasClean, this.lastEvent}) : super("close");
 }
 
-class MessageEvent {
+class MessageEvent extends event.Event {
   var data;
-  MessageEvent(this.data);
+  MessageEvent(this.data) : super("message");
 }
 
-class SockJSEvents extends event.Events {
-  get open => this["open"];
-  get message => this["message"];
-  get close => this["close"];
-  get heartbeat => this["heartbeat"];
-}
-
-class Client implements event.Emitter<SockJSEvents> {
-
-  SockJSEvents on = new SockJSEvents();
+class Client extends Object with event.Emitter {
 
   bool debug;
   bool devel;
@@ -56,7 +47,7 @@ class Client implements event.Emitter<SockJSEvents> {
     }
 
     _ir = new InfoReceiver.forURL(_baseUrl);
-    _ir.on.finish.add((InfoReceiverEvent evt) {
+    _ir.onFinish.listen((InfoReceiverEvent evt) {
         _ir = null;
         if (evt.info != null) {
             _applyInfo(evt.info);
@@ -66,6 +57,11 @@ class Client implements event.Emitter<SockJSEvents> {
         }
     });
   }
+
+  Stream get onOpen => this["open"];
+  Stream get onMessage => this["message"];
+  Stream get onClose => this["close"];
+  Stream get onHeartbeat => this["heartbeat"];
 
   send(data) {
     if (readyState == CONNECTING) {
@@ -110,7 +106,7 @@ class Client implements event.Emitter<SockJSEvents> {
     }
     readyState = CLOSED;
 
-    Timer.run(() => on.close.dispatch(close_event));
+    Timer.run(() => dispatch(close_event));
   }
 
   _dispatchOpen() {
@@ -120,7 +116,7 @@ class Client implements event.Emitter<SockJSEvents> {
             _transportTref = null;
         }
         readyState = OPEN;
-        on.open.dispatch();
+        dispatch("open");
     } else {
         // The server might have been restarted, and lost track of our
         // connection.
@@ -132,14 +128,14 @@ class Client implements event.Emitter<SockJSEvents> {
     if (readyState != OPEN) {
             return;
     }
-    on.message.dispatch(new MessageEvent(data));
+   dispatch(new MessageEvent(data));
   }
 
   _dispatchHeartbeat() {
     if (readyState != OPEN) {
         return;
     }
-    on.heartbeat.dispatch();
+    dispatch("heartbeat");
   }
 
   _didMessage(String data) {

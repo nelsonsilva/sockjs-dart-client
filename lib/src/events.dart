@@ -1,64 +1,20 @@
 library events;
 
-typedef void Listener(event);
+import "dart:async";
 
 class Event {
   String type;
   Event(this.type);
 }
 
-class Events {
+class Emitter {
 
-  Map<String, ListenerList> _listeners;
+  final _evtController = new StreamController<Event>.broadcast();
 
-  Events() : _listeners = <String, ListenerList>{};
+  Stream<Event> operator[] (type) => _evtController.stream.where((e) => e.type == type);
 
-  ListenerList operator [](String type) => _listeners.putIfAbsent(type, () {
-    return new ListenerList(type); 
-  });
-
-  removeAllListeners() => _listeners = {};
+  dispatch(evtOrType) {
+    var evt = (evtOrType is String) ? new Event(evtOrType) : evtOrType;
+    _evtController.add(evt);
+  }
 }
-
-abstract class Emitter<E extends Events>{
-
-  E on;
-
-}
-
-class ListenerList {
-
-  final String _type;
-
-  final List<Listener> _listeners;
-
-  ListenerList(this._type) : _listeners = <Listener>[];
-
-  ListenerList add(Listener listener) {
-    _add(listener);
-    return this;
-  }
-
-  ListenerList remove(Listener listener) {
-    _remove(listener);
-    return this;
-  }
-
-  bool dispatch([evt]) {
-    //assert(evt.type == _type);
-    _listeners.forEach((l) => l(evt));
-  }
-
-  void _add(Listener listener) {
-    _listeners.add(listener);
-  }
-
-  void _remove(Listener listener) {
-    _listeners.removeRange(_listeners.indexOf(listener), 1);
-  }
-
-  int get length => _listeners.length;
-
-  bool get isEmpty => _listeners.isEmpty;
-}
-

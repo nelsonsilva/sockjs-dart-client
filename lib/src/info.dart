@@ -16,20 +16,17 @@ class Info {
   }
 }
 
-class InfoReceiverEvent {
+class InfoReceiverEvent extends event.Event {
   Info info;
   num rtt;
-  InfoReceiverEvent([this.info = null, this.rtt]);
+  InfoReceiverEvent(String type, [this.info = null, this.rtt]) : super(type);
 }
 
-class InfoReceiverEvents extends event.Events {
-  get finish => this["finish"];
-}
+abstract class InfoReceiver extends Object with event.Emitter {
 
-abstract class InfoReceiver implements event.Emitter<InfoReceiverEvents> {
-  InfoReceiverEvents on;
+  InfoReceiver._();
 
-  InfoReceiver() : on = new InfoReceiverEvents();
+  Stream<event.Event> get onFinish => this["finish"];
 
   factory InfoReceiver.forURL(String baseUrl) {
     if (utils.isSameOriginUrl(baseUrl)) {
@@ -55,7 +52,7 @@ abstract class InfoReceiver implements event.Emitter<InfoReceiverEvents> {
 
 class AjaxInfoReceiver extends InfoReceiver {
 
-  AjaxInfoReceiver(String baseUrl, AjaxObjectFactory xhrFactory) {
+  AjaxInfoReceiver(String baseUrl, AjaxObjectFactory xhrFactory) : super._() {
     Timer.run(() => doXhr(baseUrl, xhrFactory));
   }
 
@@ -63,22 +60,22 @@ class AjaxInfoReceiver extends InfoReceiver {
     var t0 = new DateTime.now().millisecondsSinceEpoch;
     var xo = xhrFactory('GET', "$baseUrl/info");
 
-    var tref = new Timer(new Duration(milliseconds:8000), xo.on.timeout.dispatch);
+    var tref = new Timer(new Duration(milliseconds:8000), () => dispatch("timeout"));
 
-    xo.on.finish.add( (StatusEvent evt) {
+    xo.onFinish.listen( (StatusEvent evt) {
         tref.cancel();
         tref = null;
         if (evt.status == 200) {
             var rtt = new DateTime.now().millisecondsSinceEpoch - t0;
             var info = new Info.fromJSON(JSON.decode(evt.text));
-            on.finish.dispatch(new InfoReceiverEvent(info, rtt));
+            dispatch(new InfoReceiverEvent("finish", info, rtt));
         } else {
-            on.finish.dispatch(new InfoReceiverEvent());
+            dispatch(new InfoReceiverEvent("finish"));
         }
     });
-    xo.on.timeout.add( (_) {
+    xo.onTimeout.listen( (_) {
         xo.close();
-        on.finish.dispatch();
+        dispatch(new InfoReceiverEvent("finish"));
     });
   }
 }
@@ -86,7 +83,7 @@ class AjaxInfoReceiver extends InfoReceiver {
 
 class InfoReceiverIframe extends InfoReceiver {
 
-  InfoReceiverIframe (base_url) {
+  InfoReceiverIframe(base_url) : super._() {
     if(document.body == null) {
       document.onLoad.listen((_) => go());
     } else {
@@ -123,11 +120,11 @@ class InfoReceiverIframe extends InfoReceiver {
 
 class InfoReceiverFake extends InfoReceiver {
 
-  InfoReceiverFake() {
+  InfoReceiverFake() : super._() {
     // It may not be possible to do cross domain AJAX to get the info
     // data, for example for IE7. But we want to run JSONP, so let's
     // fake the response, with rtt=2s (rto=6s).
-    new Timer(new Duration(milliseconds:2000), on.finish.dispatch);
+    new Timer(new Duration(milliseconds:2000), () => dispatch("finish"));
   }
 }
 
@@ -136,7 +133,7 @@ class InfoReceiverFake extends InfoReceiver {
 class WInfoReceiverIframe {
   WInfoReceiverIframe(ri, _trans_url, baseUrl) {
     var ir = new AjaxInfoReceiver(baseUrl, XHRLocalObjectFactory);
-    ir.on.finish.add( (evt) {
+    ir.onFinish.listen( (evt) {
         ri._didMessage('m${JSON.encode([evt.info, evt.rtt])}');
         ri._didClose();
     });
