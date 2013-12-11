@@ -12,9 +12,9 @@ print(m, [p = '']) {
   if(!p.isEmpty) {
     p = JSON.encode(p);
   }
-  div.children
-    ..add(new Element.html("<code/>")..text=("$m$p"))
-    ..add(new Element.html("<br>"));
+  div
+    ..append(new Element.html("<code/>")..text=("$m$p"))
+    ..append(new Element.html("<br>"));
 
   div.scrollTop += 10000;
 }

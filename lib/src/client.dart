@@ -136,7 +136,7 @@ class Client implements event.Emitter<SockJSEvents> {
   }
 
   _dispatchHeartbeat() {
-    if (!identical(readyState, OPEN)) {
+    if (readyState != OPEN) {
         return;
     }
     on.heartbeat.dispatch();

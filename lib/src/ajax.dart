@@ -18,7 +18,7 @@ class AbstractXHRObject implements event.Emitter<XHREvents> {
   XHREvents on = new XHREvents();
 
   HttpRequest xhr;
-  StreamSubscription orschss;
+  StreamSubscription changeSubscription;
 
   _start(method, url, payload, {noCredentials: false, headers}) {
 
@@ -59,7 +59,7 @@ class AbstractXHRObject implements event.Emitter<XHREvents> {
         headers.forEach((k, v) => xhr.setRequestHeader(k, v));
     }
 
-    orschss = xhr.onReadyStateChange.listen(_readyStateHandler);
+    changeSubscription = xhr.onReadyStateChange.listen(_readyStateHandler);
 
     xhr.send(payload);
   }
@@ -92,7 +92,7 @@ class AbstractXHRObject implements event.Emitter<XHREvents> {
     // utils.unload_del(that.unload_ref);
 
     // IE needs this field to be a function
-    orschss.cancel();
+    changeSubscription.cancel();
 
     if (abort) {
         try {

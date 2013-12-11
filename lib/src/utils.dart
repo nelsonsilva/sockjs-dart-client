@@ -4,7 +4,7 @@ import 'dart:math' as Math;
 import 'dart:html';
 import 'dart:convert';
 
-import "package:sockjs_client/sockjs.dart" as SockJS;
+import "../sockjs.dart" as SockJS;
 
 const random_string_chars = 'abcdefghijklmnopqrstuvwxyz0123456789_';
 String random_string(length, [max]) {
@@ -43,11 +43,11 @@ amendUrl(String url) {
     }
 
     //  '//abc' --> 'http://abc'
-    if (identical(url.indexOf('//'), 0)) {
+    if (url.indexOf('//') == 0) {
         url = "${dl.protocol}$url";
     }
     // '/abc' --> 'http://localhost:80/abc'
-    if (identical(url.indexOf('/'), 0)) {
+    if (url.indexOf('/') == 0) {
         url = "${dl.protocol}//${dl.host}$url";
     }
     // strip trailing slashes
