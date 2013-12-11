@@ -2,9 +2,11 @@ part of sockjs_client;
 
 class WebSocketTransport {
   Client ri;
-  var url;
+  String url;
 
   WebSocket ws;
+  StreamSubscription messageSubscription;
+  StreamSubscription closeSubscription;
 
   static create(ri, transUrl, [baseUrl]) => new WebSocketTransport(ri, transUrl);
 
@@ -21,7 +23,7 @@ class WebSocketTransport {
     ws = new WebSocket(url);
 
 
-    ws.on.message.add(_msgHandler);
+    messageSubscription = ws.onMessage.listen(_msgHandler);
 
     // Firefox has an interesting bug. If a websocket connection is
     // created after onbeforeunload, it stays alive even when user
@@ -30,7 +32,7 @@ class WebSocketTransport {
     // https://github.com/sockjs/sockjs-client/issues/28
     // https://bugzilla.mozilla.org/show_bug.cgi?id=696085
     //that.unload_ref = utils.unload_add(function(){that.ws.close()});
-    ws.on.close.add(_closeHandler);
+    closeSubscription = ws.onClose.listen(_closeHandler);
   }
 
   _msgHandler(m) => ri._didMessage(m.data);
@@ -41,8 +43,8 @@ class WebSocketTransport {
 
   doCleanup() {
     if (ws != null) {
-        ws.on.message.remove(_msgHandler);
-        ws.on.close.remove(_closeHandler);
+        messageSubscription.cancel();
+        closeSubscription.cancel();
         ws.close();
         //utils.unload_del(that.unload_ref);
         //that.unload_ref = null;
@@ -61,7 +63,7 @@ class WebSocketTransport {
       res = false;
     } finally {
       try {
-        ws.on.open.add((e) => ws.close());
+        ws.onOpen.listen((e) => ws.close());
       } catch (_){}
     }
 

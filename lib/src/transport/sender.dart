@@ -35,15 +35,15 @@ class BufferedSender {
             sendStop = null;
             tref.cancel();
         };
-        tref = utils.delay(() {
+        tref = new Timer(new Duration(milliseconds:25), () {
             sendStop = null;
             sendSchedule();
-        }, 25);
+        });
     }
 
   sendSchedule() {
     if (!sendBuffer.isEmpty) {
-        var payload = '[${Strings.join(sendBuffer, ',')}]';
+        var payload = '[${sendBuffer.join(',')}]';
         sendStop = sender(transUrl,
                            payload,
                            ([status, reason]) {
@@ -62,6 +62,8 @@ class BufferedSender {
   }
 }
 
+/** TODO To be fixed since Dart 1.0 does not give access anymore to IFrame ReadyState and only authorize
+// postMessage communication */
 class JsonPGenericSender {
 
   FormElement _sendForm = null;
@@ -82,8 +84,8 @@ class JsonPGenericSender {
       form.method = 'POST';
       form.enctype = 'application/x-www-form-urlencoded';
       form.acceptCharset = "UTF-8";
-      form.elements.add(area);
-      document.body.elements.add(form);
+      form.children.add(area);
+      document.body.children.add(form);
     }
     form = _sendForm;
     area = _sendArea;
@@ -100,7 +102,7 @@ class JsonPGenericSender {
         iframe.name = id;
     }
     iframe.id = id;
-    form.elements.add(iframe);
+    form.children.add(iframe);
     iframe.style.display = 'none';
 
     try {
@@ -122,10 +124,10 @@ class JsonPGenericSender {
 
         // Opera mini doesn't like if we GC iframe
         // immediately, thus this timeout.
-        utils.delay(() {
-                       iframe.parentNode.removeChild(iframe);
+        new Timer(new Duration(milliseconds: 500),() {
+                       iframe.remove();
                        iframe = null;
-                   }, 500);
+                   });
         area.value = '';
         callback();
     };
@@ -136,7 +138,6 @@ class JsonPGenericSender {
     //return completed;
   }
 }
-
 
 createAjaxSender(AjaxObjectFactory xhrFactory)
     => (url, payload, callback([status, reason])) {

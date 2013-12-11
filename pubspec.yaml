@@ -1,4 +1,10 @@
 name:  sockjs_client
-version: 0.1.0
-author: Nelson Silva <nelson.silva@inevo.pt>
+version: 0.2.0
+authors:
+- Nelson Silva <nelson.silva@inevo.pt>
+- Sébastien Deleuze
 description:  A SockJS client in Dart
+dependencies:
+  browser: '>=0.9.0 <1.0.0'
+environment:
+  sdk: '>=1.0.0'

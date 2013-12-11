@@ -56,21 +56,21 @@ abstract class InfoReceiver implements event.Emitter<InfoReceiverEvents> {
 class AjaxInfoReceiver extends InfoReceiver {
 
   AjaxInfoReceiver(String baseUrl, AjaxObjectFactory xhrFactory) {
-    utils.delay(() => doXhr(baseUrl, xhrFactory));
+    Timer.run(() => doXhr(baseUrl, xhrFactory));
   }
 
   doXhr(String baseUrl, AjaxObjectFactory xhrFactory) {
-    var t0 = new Date.now().millisecondsSinceEpoch;
+    var t0 = new DateTime.now().millisecondsSinceEpoch;
     var xo = xhrFactory('GET', "$baseUrl/info");
 
-    var tref = utils.delay(() => xo.on.timeout.dispatch(), 8000);
+    var tref = new Timer(new Duration(milliseconds:8000), xo.on.timeout.dispatch);
 
     xo.on.finish.add( (StatusEvent evt) {
         tref.cancel();
         tref = null;
         if (evt.status == 200) {
-            var rtt = new Date.now().millisecondsSinceEpoch - t0;
-            var info = new Info.fromJSON(JSON.parse(evt.text));
+            var rtt = new DateTime.now().millisecondsSinceEpoch - t0;
+            var info = new Info.fromJSON(JSON.decode(evt.text));
             on.finish.dispatch(new InfoReceiverEvent(info, rtt));
         } else {
             on.finish.dispatch(new InfoReceiverEvent());
@@ -88,7 +88,7 @@ class InfoReceiverIframe extends InfoReceiver {
 
   InfoReceiverIframe (base_url) {
     if(document.body == null) {
-      document.on.load.add((_) => go());
+      document.onLoad.listen((_) => go());
     } else {
         go();
     }
@@ -127,7 +127,7 @@ class InfoReceiverFake extends InfoReceiver {
     // It may not be possible to do cross domain AJAX to get the info
     // data, for example for IE7. But we want to run JSONP, so let's
     // fake the response, with rtt=2s (rto=6s).
-    utils.delay(() => on.finish.dispatch(), 2000);
+    new Timer(new Duration(milliseconds:2000), on.finish.dispatch);
   }
 }
 
@@ -137,7 +137,7 @@ class WInfoReceiverIframe {
   WInfoReceiverIframe(ri, _trans_url, baseUrl) {
     var ir = new AjaxInfoReceiver(baseUrl, XHRLocalObjectFactory);
     ir.on.finish.add( (evt) {
-        ri._didMessage('m${JSON.stringify([evt.info, evt.rtt])}');
+        ri._didMessage('m${JSON.encode([evt.info, evt.rtt])}');
         ri._didClose();
     });
   }

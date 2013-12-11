@@ -1,9 +1,9 @@
 part of sockjs_client;
 
 class XHREvents extends event.Events {
-  get chunk => this["chunk"];
-  get finish => this["finish"];
-  get timeout => this["timeout"];
+  event.ListenerList get chunk => this["chunk"];
+  event.ListenerList get finish => this["finish"];
+  event.ListenerList get timeout => this["timeout"];
 }
 
 class StatusEvent {
@@ -18,6 +18,7 @@ class AbstractXHRObject implements event.Emitter<XHREvents> {
   XHREvents on = new XHREvents();
 
   HttpRequest xhr;
+  StreamSubscription changeSubscription;
 
   _start(method, url, payload, {noCredentials: false, headers}) {
 
@@ -41,7 +42,7 @@ class AbstractXHRObject implements event.Emitter<XHREvents> {
     //that.unload_ref = utils.unload_add(function(){that._cleanup(true);});
 
     try {
-        xhr.open(method, url, true);
+        xhr.open(method, url);
     } catch(e) {
         // IE raises an exception on wrong port.
         on.finish.dispatch(new StatusEvent());
@@ -54,11 +55,11 @@ class AbstractXHRObject implements event.Emitter<XHREvents> {
         // "This never affects same-site requests."
         xhr.withCredentials = true;
     }
-    if (?headers) {
+    if (headers != null) {
         headers.forEach((k, v) => xhr.setRequestHeader(k, v));
     }
 
-    xhr.on.readyStateChange.add(_readyStateHandler);
+    changeSubscription = xhr.onReadyStateChange.listen(_readyStateHandler);
 
     xhr.send(payload);
   }
@@ -91,7 +92,7 @@ class AbstractXHRObject implements event.Emitter<XHREvents> {
     // utils.unload_del(that.unload_ref);
 
     // IE needs this field to be a function
-    xhr.on.readyStateChange.remove(_readyStateHandler);
+    changeSubscription.cancel();
 
     if (abort) {
         try {
@@ -109,7 +110,7 @@ class AbstractXHRObject implements event.Emitter<XHREvents> {
 
 class XHRCorsObject extends AbstractXHRObject {
    XHRCorsObject(method, url, payload, {noCredentials, headers} )  {
-    utils.delay(()=>_start(method, url, payload, noCredentials: false));
+    Timer.run(() =>_start(method, url, payload, noCredentials: false));
    }
 }
 
@@ -117,7 +118,7 @@ class XHRCorsObject extends AbstractXHRObject {
 
 class XHRLocalObject extends AbstractXHRObject {
   XHRLocalObject (method, url, payload, {noCredentials, headers}) {
-    utils.delay(() => _start(method, url, payload, noCredentials: true));
+    Timer.run(() =>_start(method, url, payload, noCredentials: true));
     }
 }
 
