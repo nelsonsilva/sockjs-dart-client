@@ -7,7 +7,10 @@ class Polling {
   String recvUrl;
   AjaxObjectFactory xhrFactory;
 
-  var poll;
+  XhrReceiver poll;
+  StreamSubscription messageSubscription;
+  StreamSubscription closeSubscription;
+  
   bool pollIsClosing = false;
 
   Polling(this.ri, this.receiverFactory, this.recvUrl, this.xhrFactory) {
@@ -21,12 +24,12 @@ class Polling {
       msg_counter += 1;
       ri._didMessage(e.data);
     };
-    poll.on.message.add(msgHandler);
+    messageSubscription = poll.onMessage.listen(msgHandler);
 
     var closeHandler;
     closeHandler = (e) {
-        poll.on.message.remove(msgHandler);
-        poll.on.close.remove(closeHandler);
+        messageSubscription.cancel();
+        closeSubscription.cancel();
         poll = null;
         if (!pollIsClosing) {
             if (e.reason == 'permanent') {
@@ -36,7 +39,7 @@ class Polling {
             }
         }
      };
-    poll.on.close.add(closeHandler);
+     closeSubscription = poll.onClose.listen(closeHandler);
   }
 
   abort() {
