@@ -6,11 +6,7 @@ class Polling {
   var receiverFactory;
   String recvUrl;
   AjaxObjectFactory xhrFactory;
-
   XhrReceiver poll;
-  StreamSubscription messageSubscription;
-  StreamSubscription closeSubscription;
-  
   bool pollIsClosing = false;
 
   Polling(this.ri, this.receiverFactory, this.recvUrl, this.xhrFactory) {
@@ -24,10 +20,9 @@ class Polling {
       msg_counter += 1;
       ri._didMessage(e.data);
     };
-    messageSubscription = poll.onMessage.listen(msgHandler);
+    var messageSubscription, closeSubscription;
 
-    var closeHandler;
-    closeHandler = (e) {
+    var closeHandler = (e) {
         messageSubscription.cancel();
         closeSubscription.cancel();
         poll = null;
@@ -39,6 +34,7 @@ class Polling {
             }
         }
      };
+     messageSubscription = poll.onMessage.listen(msgHandler);
      closeSubscription = poll.onClose.listen(closeHandler);
   }
 
