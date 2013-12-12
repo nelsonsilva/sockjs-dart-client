@@ -16,17 +16,17 @@ class Info {
   }
 }
 
-class InfoReceiverEvent extends event.Event {
+class InfoReceiverEvent extends events.Event {
   Info info;
   num rtt;
   InfoReceiverEvent(String type, [this.info = null, this.rtt]) : super(type);
 }
 
-abstract class InfoReceiver extends Object with event.Emitter {
+abstract class InfoReceiver extends events.Emitter {
 
   InfoReceiver._();
 
-  Stream<event.Event> get onFinish => this["finish"];
+  Stream<events.Event> get onFinish => this.streamOf("finish");
 
   factory InfoReceiver.forURL(String baseUrl) {
     if (utils.isSameOriginUrl(baseUrl)) {

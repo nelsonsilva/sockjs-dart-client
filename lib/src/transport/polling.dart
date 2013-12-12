@@ -3,7 +3,7 @@ part of sockjs_client;
 class Polling {
 
   Client ri;
-  var receiverFactory;
+  ReceiverFactory receiverFactory;
   String recvUrl;
   AjaxObjectFactory xhrFactory;
   XhrReceiver poll;

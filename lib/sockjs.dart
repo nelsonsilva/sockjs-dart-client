@@ -5,7 +5,7 @@ import "dart:convert";
 import "dart:async";
 import "dart:js";
 
-import "src/events.dart" as event;
+import "src/events.dart" as events;
 import "src/utils.dart" as utils;
 
 part "src/ajax.dart";
