@@ -1,6 +1,6 @@
 part of sockjs_client;
 
-class StatusEvent extends event.Event {
+class StatusEvent extends events.Event {
   int status;
   String text;
   StatusEvent(String type, [this.status = 0, this.text = ""]) : super(type);
@@ -8,14 +8,14 @@ class StatusEvent extends event.Event {
 
 typedef AbstractXHRObject AjaxObjectFactory(String method, String baseUrl, [payload]);
 
-class AbstractXHRObject extends Object with event.Emitter {
+class AbstractXHRObject extends events.Emitter {
 
   HttpRequest xhr;
   StreamSubscription changeSubscription;
 
-  Stream get onChunk => this["chunk"];
-  Stream get onFinish => this["finish"];
-  Stream get onTimeout => this["timeout"];
+  Stream get onChunk => this.streamOf("chunk");
+  Stream get onFinish => this.streamOf("finish");
+  Stream get onTimeout => this.streamOf("timeout");
 
   _start(method, url, payload, {noCredentials: false, headers}) {
 

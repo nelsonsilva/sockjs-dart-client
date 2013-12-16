@@ -1,6 +1,6 @@
 part of sockjs_client;
 
-class CloseEvent extends event.Event {
+class CloseEvent extends events.Event {
   int code;
   String reason;
   bool wasClean;
@@ -9,12 +9,12 @@ class CloseEvent extends event.Event {
   CloseEvent({this.code, this.reason, this.wasClean, this.lastEvent}) : super("close");
 }
 
-class MessageEvent extends event.Event {
+class MessageEvent extends events.Event {
   var data;
   MessageEvent(this.data) : super("message");
 }
 
-class Client extends Object with event.Emitter {
+class Client extends Object with events.Emitter {
 
   bool debug;
   bool devel;
@@ -31,7 +31,7 @@ class Client extends Object with event.Emitter {
   num rto;
   List<String> protocolsWhitelist = [];
 
-  var _ir;
+  InfoReceiver _ir;
 
   var _transport = null;
   Timer _transportTref;
@@ -58,10 +58,10 @@ class Client extends Object with event.Emitter {
     });
   }
 
-  Stream get onOpen => this["open"];
-  Stream get onMessage => this["message"];
-  Stream get onClose => this["close"];
-  Stream get onHeartbeat => this["heartbeat"];
+  Stream get onOpen => this.streamOf("open");
+  Stream get onMessage => this.streamOf("message");
+  Stream get onClose => this.streamOf("close");
+  Stream get onHeartbeat => this.streamOf("heartbeat");
 
   send(data) {
     if (readyState == CONNECTING) {
@@ -80,7 +80,8 @@ class Client extends Object with event.Emitter {
             throw 'INVALID_STATE_ERR';
     }
     if (_ir != null) {
-        _ir.nuke();
+        // TODO : implement nuke      
+        // _ir.nuke();
         _ir = null;
     }
 
@@ -89,24 +90,24 @@ class Client extends Object with event.Emitter {
         _transport = null;
     }
 
-    var close_event = new CloseEvent(
+    var closeEvent = new CloseEvent(
         code: code,
         reason: reason,
         wasClean: utils.userSetCode(code));
 
     if (!utils.userSetCode(code) &&
         readyState == CONNECTING && !force) {
-        if (_tryNextProtocol(close_event)) {
+        if (_tryNextProtocol(closeEvent)) {
             return;
         }
-        close_event = new CloseEvent( code: 2000,
+        closeEvent = new CloseEvent( code: 2000,
                                       reason: "All transports failed",
                                       wasClean: false,
-                                      lastEvent: close_event );
+                                      lastEvent: closeEvent );
     }
     readyState = CLOSED;
 
-    Timer.run(() => dispatch(close_event));
+    Timer.run(() => dispatch(closeEvent));
   }
 
   _dispatchOpen() {
