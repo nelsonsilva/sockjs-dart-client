@@ -4,7 +4,7 @@ import 'dart:math' as Math;
 import 'dart:html';
 import 'dart:convert';
 
-import "../sockjs.dart" as SockJS;
+import "../sockjs_client.dart" as SockJS;
 
 const random_string_chars = 'abcdefghijklmnopqrstuvwxyz0123456789_';
 String random_string(length, [max]) {
