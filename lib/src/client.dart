@@ -62,6 +62,7 @@ class Client extends Object with event.Emitter {
   Stream get onMessage => this["message"];
   Stream get onClose => this["close"];
   Stream get onHeartbeat => this["heartbeat"];
+  String get url => this._baseUrl;
 
   send(data) {
     if (readyState == CONNECTING) {
