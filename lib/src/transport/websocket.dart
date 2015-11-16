@@ -54,18 +54,22 @@ class WebSocketTransport {
 
   static bool get enabled {
     var res = true;
-    var ws;
+    // CHANGE: don't ping echo.websocket.org
 
-    // Ugly detection stuff - must be online
-    try {
-      ws = new WebSocket('ws://echo.websocket.org');
-    } on dynamic catch(e) {
-      res = false;
-    } finally {
-      try {
-        ws.onOpen.listen((e) => ws.close());
-      } catch (_){}
-    }
+    // var ws;
+
+    // // Ugly detection stuff - must be online
+    // try {
+    //   ws = new WebSocket('ws://echo.websocket.org');
+    // } on dynamic catch(e) {
+    //   res = false;
+    // } finally {
+    //   try {
+    //     ws.onOpen.listen((e) => ws.close());
+    //   } catch (_){}
+    // }
+
+    // END CHANGE
 
     return res;
   }
