@@ -1,3 +1,5 @@
 .project
 packages
+.packages
+pubspec.lock
 
