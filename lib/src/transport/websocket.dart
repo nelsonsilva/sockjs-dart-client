@@ -9,6 +9,8 @@ class WebSocketTransport {
   StreamSubscription closeSubscription;
 
   static create(ri, transUrl, [baseUrl]) => new WebSocketTransport(ri, transUrl);
+  static String probeAddress = 'echo.websocket.org';
+  static bool probeSecure = false;
 
   WebSocketTransport(this.ri, transUrl) {
     var url = '$transUrl/websocket';
@@ -58,7 +60,8 @@ class WebSocketTransport {
 
     // Ugly detection stuff - must be online
     try {
-      ws = new WebSocket('ws://echo.websocket.org');
+      ws = new WebSocket((WebSocketTransport.probeSecure ? 'wss://' : 'ws://') +
+        WebSocketTransport.probeAddress);
     } on dynamic catch(e) {
       res = false;
     } finally {
